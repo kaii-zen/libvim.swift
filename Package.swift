@@ -102,6 +102,8 @@ let package = Package(
         ),
         .testTarget(
             name: "libvimTests",
-            dependencies: ["libvim"]),
+            dependencies: ["libvim"],
+            resources: [ .copy("Resources") ]
+        ),
     ]
 )
