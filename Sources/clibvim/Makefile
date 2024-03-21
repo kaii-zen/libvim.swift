@@ -1,28 +1,17 @@
 # -*- mode: makefile-gmake -*-
 
-LIBVIM_SRC = onilibvim/src
-CFLAGS = -DHAVE_CONFIG_H -DMACOS_X -DMACOS_X_DARWIN -Iinclude -I$(LIBVIM_SRC)/proto
+LIBVIM_SRC := onilibvim/src
 
--include include.d
+all: src include
 
-include.d: include/auto/config.h
-	set -eo pipefail; \
-		$(CC) $(CFLAGS) -MM $(LIBVIM_SRC)/libvim.h \
-		| sed "s|^libvim\.o|include|; s|$(LIBVIM_SRC)|include|g; s|proto/||g" > $@
+src: include
 
-include/%.pro: $(LIBVIM_SRC)/proto/%.pro
-	mkdir -p $(dir $@) && install $^ $@
+src include:
+	$(MAKE) -C $@
 
-include/%.h: $(LIBVIM_SRC)/%.h
-	mkdir -p $(dir $@) && install $^ $@
-
-include/auto/config.h:
-	cd $(LIBVIM_SRC) && ./configure CFLAGS=-Wno-implicit-int
-	mkdir -p $(dir $@)
-	mv $(LIBVIM_SRC)/auto/config.h $@
-	echo '#include "fixes.h"' >> $@
-
-.PHONY: clean
 clean:
 	$(MAKE) -C $(LIBVIM_SRC) distclean
-	rm -rf include/*.h include/*.pro include/auto/config.h
+	$(MAKE) -C src clean
+	$(MAKE) -C include clean
+
+.PHONY: all src include clean

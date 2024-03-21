@@ -20,7 +20,14 @@ let package = Package(
             sources: [
               "auto/pathdef.c",
               "init.c",
-            ] + [
+              "xdiff/xdiffi.c",
+              "xdiff/xemit.c",
+              "xdiff/xhistogram.c",
+              "xdiff/xpatience.c",
+              "xdiff/xprepare.c",
+              "xdiff/xutils.c",
+            ].map { "src/" + $0 }
+              + [
               "arabic.c",
               "autocmd.c",
               "blob.c",
@@ -82,17 +89,15 @@ let package = Package(
               "userfunc.c",
               "version.c",
               "window.c",
-              "xdiff/xdiffi.c",
-              "xdiff/xemit.c",
-              "xdiff/xhistogram.c",
-              "xdiff/xpatience.c",
-              "xdiff/xprepare.c",
-              "xdiff/xutils.c",
-            ].map { "onilibvim/src/\($0)" },
+            ].map { "onilibvim/src/" + $0 },
             cSettings: [
                 .define("HAVE_CONFIG_H"),
                 .define("MACOS_X"),
                 .define("MACOS_X_DARWIN"),
+                .headerSearchPath("."),
+                .headerSearchPath("include"),
+                .headerSearchPath("onilibvim/src"),
+                .headerSearchPath("onilibvim/src/proto"),
             ]
 
         ),
