@@ -9,10 +9,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "libvim",
-            targets: ["libvim"]),
-        .library(
-            name: "clibvim",
-            targets: ["clibvim"]),
+            targets: ["libvim"])
     ],
     targets: [
         .target(
