@@ -10,8 +10,8 @@ import XCTest
 
 final class BufferUpdatesTests: VimTestCase {
     var updateCount = 0;
-    var lastLnum: UInt = 0;
-    var lastLnume: UInt = 0;
+    var lastLnum: Vim.LineNumber = 0;
+    var lastLnume: Vim.LineNumber = 0;
     var lastXtra = 0;
     var lastVersionAtUpdateTime = 0;
 

@@ -82,19 +82,28 @@ public func vimInit(_ args: String...) {
  ***/
 
 public extension Vim {
+    // TODO: Wrap in RawRepresentable struct
     typealias Buffer = UnsafeMutablePointer<buf_T>
-    struct BufferUpdate {
-        public typealias CBufferUpdate = bufferUpdate_T
-        let buf: Buffer
-        let lnum: UInt  // first line with change
-        let lnume: UInt // line below last changed line
-        let xtra: Int   // number of extra lines (negative when deleting)
 
-        public init(_ cBufferUpdate: CBufferUpdate) {
-            buf = cBufferUpdate.buf
-            lnum = UInt(cBufferUpdate.lnum)
-            lnume = UInt(cBufferUpdate.lnume)
-            xtra = Int(cBufferUpdate.xtra)
+    struct BufferUpdate: RawRepresentable {
+        public typealias RawValue = bufferUpdate_T
+        let buf: Buffer
+        let lnum: LineNumber  // first line with change
+        let lnume: LineNumber // line below last changed line
+        let xtra: Int         // number of extra lines (negative when deleting)
+
+        public init?(rawValue: RawValue) {
+            buf = rawValue.buf
+            lnum = rawValue.lnum
+            lnume = rawValue.lnume
+            xtra = Int(rawValue.xtra)
+        }
+
+        public var rawValue: RawValue {
+            .init(buf: buf,
+                  lnum: lnum,
+                  lnume: lnume,
+                  xtra: CLong(xtra))
         }
     }
 }
@@ -251,7 +260,7 @@ var vimBufferUpdateCallback: BufferUpdateCallback?
 public func vimSetBufferUpdateCallback(_ callback: @escaping BufferUpdateCallback) {
     vimBufferUpdateCallback = callback
     let cCallback: clibvim.BufferUpdateCallback? = { cBufferUpdate in
-        vimBufferUpdateCallback?(Vim.BufferUpdate(cBufferUpdate))
+        vimBufferUpdateCallback?(Vim.BufferUpdate(rawValue: cBufferUpdate)!)
     }
     clibvim.vimSetBufferUpdateCallback(cCallback)
 }
@@ -266,6 +275,7 @@ public typealias AutoCommandCallback = (_ event: Vim.Event, _ buffer: Vim.Buffer
 var vimAutoCommandCallback: AutoCommandCallback?
 
 public extension Vim {
+    // TODO: Wrap in RawRepresentable struct
     typealias Event = event_T
 }
 
@@ -313,6 +323,7 @@ public typealias CustomCommandCallback = (_ exCommand: Vim.ExCommand) -> Bool
 var vimCustomCommandHandler: CustomCommandCallback?
 
 public extension Vim {
+    // TODO: Conform to RawRepresentable
     struct ExCommand {
         public typealias CExCommand = exCommand_T
         let cExCommandPointer: UnsafeMutablePointer<CExCommand>
@@ -736,6 +747,7 @@ public func vimColorSchemeSetCompletionCallback(_ callback: ColorSchemeCompletio
  */
 
 public extension Vim {
+    // TODO: Wrap in RawRepresentable struct
     typealias MapBlock = mapblock_T
 }
 //void vimSetInputMapCallback(InputMapCallback mapCallback);

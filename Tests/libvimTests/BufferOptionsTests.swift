@@ -12,8 +12,8 @@ final class BufferOptionsTests: VimTestCase {
     let MAX_TEST_MESSAGE = 8192
 
     var updateCount = 0;
-    var lastLnum: UInt = 0;
-    var lastLnume: UInt = 0;
+    var lastLnum: Vim.LineNumber = 0;
+    var lastLnume: Vim.LineNumber = 0;
     var lastXtra = 0;
     var lastVersionAtUpdateTime = 0;
     var lastMessage: String?
