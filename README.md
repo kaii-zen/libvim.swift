@@ -1,3 +1,5 @@
+[![macOS 14](https://github.com/kaii-zen/libvim.swift/actions/workflows/swift.yml/badge.svg)](https://github.com/kaii-zen/libvim.swift/actions/workflows/swift.yml)
+
 # libvim.swift
 
 libvim.swift is a Swift package that provides a wrapper around [libvim](https://github.com/onivim/libvim): the core Vim editing engine implemented as a minimal C library.
