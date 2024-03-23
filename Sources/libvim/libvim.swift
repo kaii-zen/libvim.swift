@@ -20,13 +20,6 @@ public let Ctrl_V = clibvim.Ctrl_V |> CUnsignedChar.init |> Character.init
 // TODO: Namespace
 public let NUL = 0 |> CUnsignedChar.init |> Character.init
 
-let EVENT_INSERTENTER = clibvim.EVENT_INSERTENTER
-let EVENT_INSERTLEAVE = clibvim.EVENT_INSERTLEAVE
-
-let EVENT_CMDLINECHANGED = clibvim.EVENT_CMDLINECHANGED
-let EVENT_CMDLINEENTER = clibvim.EVENT_CMDLINEENTER
-let EVENT_CMDLINELEAVE = clibvim.EVENT_CMDLINELEAVE
-
 // TODO: Get rid of
 public let EOL_UNKNOWN = Int(clibvim.EOL_UNKNOWN) /* not defined yet */
 public let EOL_UNIX = Int(clibvim.EOL_UNIX)     /* NL */
