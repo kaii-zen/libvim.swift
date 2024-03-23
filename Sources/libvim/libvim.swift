@@ -323,17 +323,25 @@ public typealias CustomCommandCallback = (_ exCommand: Vim.ExCommand) -> Bool
 var vimCustomCommandHandler: CustomCommandCallback?
 
 public extension Vim {
-    // TODO: Conform to RawRepresentable
-    struct ExCommand {
-        public typealias CExCommand = exCommand_T
-        let cExCommandPointer: UnsafeMutablePointer<CExCommand>
-        var cExCommand: CExCommand { cExCommandPointer.pointee }
-        var command: String { String(cString: cExCommand.cmd) }
-        var forceIt: Bool { Bool(cExCommand.forceit) }
-        var regName: Character {
-            cExCommand.regname
-            |> CUnsignedChar.init
-            |> Character.init
+    struct ExCommand: RawRepresentable {
+        public typealias RawValue = exCommand_T
+
+        public let command: String
+        public let forceIt: Bool
+        public let regName: Int
+
+        public init?(rawValue: RawValue) {
+            command = String(cString: rawValue.cmd)
+            forceIt = Bool(rawValue.forceit)
+            regName = Int(rawValue.regname)
+        }
+
+        public var rawValue: RawValue {
+            .init(
+                cmd: command.uCString,
+                forceit: CInt(forceIt),
+                regname: CInt(regName)
+            )
         }
     }
 }
@@ -341,11 +349,12 @@ public extension Vim {
 public func vimSetCustomCommandHandler(_ handler: CustomCommandCallback?) {
     vimCustomCommandHandler = handler
     let cHandler: clibvim.CustomCommandCallback? = if handler != nil {
-        { commandPointer in
-            commandPointer!
-            |> Vim.ExCommand.init(cExCommandPointer:)
-            |> vimCustomCommandHandler!
-            |> CInt.init
+        {
+            CInt(
+                vimCustomCommandHandler!(
+                    Vim.ExCommand(rawValue: $0!.pointee)!
+                )
+            )
         }
     } else {
         nil
