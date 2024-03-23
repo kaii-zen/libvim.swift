@@ -47,7 +47,8 @@ vimKey("<esc>")
 print(vimBufferGetLine(vimBufferGetCurrent, 1)) // -> Hello, World!
 ```
 
-See [tests](Tests/libvimTests) for more examples.
+For more rudimentary examples have a look at the [tests](Tests/libvimTests).
+For a basic UIKit example, see [Example/](Example).
 
 ## Requirements
 
