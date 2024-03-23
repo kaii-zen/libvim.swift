@@ -2162,11 +2162,11 @@ public typealias YankCallback = (_ yankInfo: Vim.YankInfo) -> Void
 var vimYankCallback: YankCallback?
 
 public extension Vim {
-    typealias CYankInfo = yankInfo_T
-    // TODO: RawRepresentable
-    struct YankInfo {
+    struct YankInfo: RawRepresentable {
+        public typealias RawValue = yankInfo_T
+
         var opChar: Character
-        var extraOpChar: Int
+        var extraOpChar: Character
         var regName: Character
         var blockType: Int
         var start: Position
@@ -2174,19 +2174,32 @@ public extension Vim {
         var numLines: Int
         var lines: [String]
 
-        public init(_ cYankInfo: CYankInfo) {
-            self.opChar = Character(cYankInfo.op_char)
-            self.extraOpChar = Int(cYankInfo.extra_op_char)
-            self.regName = Character(cYankInfo.regname)
-            self.blockType = Int(cYankInfo.blockType)
-            self.start = cYankInfo.start
-            self.end = cYankInfo.end
-            self.numLines = Int(cYankInfo.numLines)
-            self.lines = [String](cYankInfo.lines, count: cYankInfo.numLines)
+        public init?(rawValue: RawValue) {
+            self.opChar = Character(rawValue.op_char)
+            self.extraOpChar = Character(rawValue.extra_op_char)
+            self.regName = Character(rawValue.regname)
+            self.blockType = Int(rawValue.blockType)
+            self.start = rawValue.start
+            self.end = rawValue.end
+            self.numLines = Int(rawValue.numLines)
+            self.lines = [String](rawValue.lines, count: rawValue.numLines)
         }
 
-        public init(_ cYankInfoPointer: UnsafeMutablePointer<CYankInfo>) {
-            self.init(cYankInfoPointer.pointee)
+        public var rawValue: RawValue {
+            RawValue(
+                op_char: CInt(char: opChar),
+                extra_op_char: CInt(char: extraOpChar),
+                regname: CInt(char: regName),
+                blockType: CInt(blockType),
+                start: start,
+                end: end,
+                numLines: CInt(numLines),
+                lines: lines.cPointerPointer
+            )
+        }
+
+        public init(_ cYankInfoPointer: UnsafeMutablePointer<RawValue>) {
+            self.init(rawValue: cYankInfoPointer.pointee)!
         }
     }
 }
