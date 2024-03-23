@@ -25,7 +25,7 @@ final class FileFormatsTests: VimTestCase {
 
         let ff = vimBufferGetFileFormat(curbuf);
         print("file format: ", ff);
-        mu_check(ff == EOL_DOS);
+        mu_check(ff == .dos);
     }
 
     func test_open_lf_file() {
@@ -33,7 +33,7 @@ final class FileFormatsTests: VimTestCase {
 
         let ff = vimBufferGetFileFormat(curbuf);
         print("file format: ", ff);
-        mu_check(ff == EOL_UNIX);
+        mu_check(ff == .unix);
     }
 
     func test_write_crlf_file() {
@@ -81,18 +81,18 @@ final class FileFormatsTests: VimTestCase {
 
     func test_convert_crlf_to_lf() {
         let buf = vimBufferOpen("\(collateral)/test.crlf", 1, 0);
-        vimBufferSetFileFormat(buf, EOL_UNIX);
+        vimBufferSetFileFormat(buf, .unix);
 
         let ff = vimBufferGetFileFormat(buf);
-        mu_check(ff == EOL_UNIX);
+        mu_check(ff == .unix);
     }
 
     func test_convert_lf_to_crlf() {
         let buf = vimBufferOpen("\(collateral)/test.lf", 1, 0);
-        vimBufferSetFileFormat(buf, EOL_DOS);
+        vimBufferSetFileFormat(buf, .dos);
 
         let ff = vimBufferGetFileFormat(buf);
-        mu_check(ff == EOL_DOS);
+        mu_check(ff == .dos);
     }
 
     /*func test_open_cr_file() {

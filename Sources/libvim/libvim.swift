@@ -14,11 +14,38 @@ public let Ctrl_V = clibvim.Ctrl_V |> CUnsignedChar.init |> Character.init
 // TODO: Namespace
 public let NUL = 0 |> CUnsignedChar.init |> Character.init
 
-// TODO: Get rid of
-public let EOL_UNKNOWN = Int(clibvim.EOL_UNKNOWN) /* not defined yet */
-public let EOL_UNIX = Int(clibvim.EOL_UNIX)     /* NL */
-public let EOL_DOS = Int(clibvim.EOL_DOS)      /* CR NL */
-public let EOL_MAC = Int(clibvim.EOL_MAC)      /* CR */
+public extension Vim {
+    enum EndOfLineFormat: RawRepresentable {
+        public typealias RawValue = CInt
+
+        case unknown, // not defined yet
+             unix,    // NL
+             dos,     // CR NL
+             mac      // CR
+
+        public init?(rawValue: RawValue) {
+            let value: Self? = switch rawValue {
+            case clibvim.EOL_UNKNOWN: .unknown
+            case clibvim.EOL_UNIX: .unix
+            case clibvim.EOL_DOS: .dos
+            case clibvim.EOL_MAC: .mac
+            default: nil
+            }
+
+            guard let value else { return nil }
+            self = value
+        }
+
+        public var rawValue: RawValue {
+            switch self {
+            case .unknown: clibvim.EOL_UNKNOWN
+            case .unix: clibvim.EOL_UNIX
+            case .dos: clibvim.EOL_DOS
+            case .mac: clibvim.EOL_MAC
+            }
+        }
+    }
+}
 
 // TODO: Get rid of
 public let FILE_CHANGED = clibvim.FILE_CHANGED
@@ -221,13 +248,13 @@ public func vimBufferSetModifiable(_ buf: Vim.Buffer, _ modifiable: Bool) {
 
 //
 //int vimBufferGetFileFormat(buf_T *buf);
-public func vimBufferGetFileFormat(_ buf: Vim.Buffer) -> Int {
-    Int(clibvim.vimBufferGetFileFormat(buf))
+public func vimBufferGetFileFormat(_ buf: Vim.Buffer) -> Vim.EndOfLineFormat {
+    Vim.EndOfLineFormat(rawValue: clibvim.vimBufferGetFileFormat(buf))!
 }
 
 //void vimBufferSetFileFormat(buf_T *buf, int fileformat);
-public func vimBufferSetFileFormat(_ buf: Vim.Buffer, _ fileformat: Int) {
-    clibvim.vimBufferSetFileFormat(buf, CInt(fileformat))
+public func vimBufferSetFileFormat(_ buf: Vim.Buffer, _ fileformat: Vim.EndOfLineFormat) {
+    clibvim.vimBufferSetFileFormat(buf, fileformat.rawValue)
 }
 //
 //int vimBufferGetReadOnly(buf_T *buf);
