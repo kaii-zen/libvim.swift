@@ -18,9 +18,9 @@ final class BasicCmdlineTests: VimTestCase {
 
         vimSetAutoCommandCallback { [unowned self] command, _ in
             switch command {
-            case EVENT_CMDLINECHANGED: cmdLineChangedCount++
-            case EVENT_CMDLINEENTER: cmdLineEnterCount++
-            case EVENT_CMDLINELEAVE: cmdLineLeaveCount++
+            case .cmdLineChanged: cmdLineChangedCount++
+            case .cmdLineEnter: cmdLineEnterCount++
+            case .cmdLineLeave: cmdLineLeaveCount++
             default: break
             }
         }

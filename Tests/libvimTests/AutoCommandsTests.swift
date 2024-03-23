@@ -30,9 +30,9 @@ final class AutoCommandsTests: VimTestCase {
 
     func test_insertenter_insertleave() {
         vimInput("i");
-        mu_check(didEvent(EVENT_INSERTENTER));
+        mu_check(didEvent(.insertEnter));
 
         vimKey("<esc>");
-        mu_check(didEvent(EVENT_INSERTLEAVE));
+        mu_check(didEvent(.insertLeave));
     }
 }

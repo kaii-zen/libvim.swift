@@ -269,21 +269,346 @@ public func vimSetBufferUpdateCallback(_ callback: @escaping BufferUpdateCallbac
  * Autocommands
  ***/
 
+public extension Vim {
+    /*
+     * Events for autocommands.
+     */
+    enum Event: RawRepresentable {
+        public typealias RawValue = event_T
+
+        case bufAdd,               // after adding a buffer to the buffer list
+             bufDelete,            // deleting a buffer from the buffer list
+             bufEnter,             // after entering a buffer
+             bufFilePost,          // after renaming a buffer
+             bufFilePre,           // before renaming a buffer
+             bufHidden,            // just after buffer becomes hidden
+             bufLeave,             // before leaving a buffer
+             bufNew,               // after creating any buffer
+             bufNewFile,           // when creating a buffer for a new file
+             bufReadCmd,           // read buffer using command
+             bufReadPost,          // after reading a buffer
+             bufReadPre,           // before reading a buffer
+             bufUnload,            // just before unloading a buffer
+             bufWinEnter,          // after showing a buffer in a window
+             bufWinLeave,          // just after buffer removed from window
+             bufWipeOut,           // just before really deleting a buffer
+             bufWriteCmd,          // write buffer using command
+             bufWritePost,         // after writing a buffer
+             bufWritePre,          // before writing a buffer
+             cmdLineChanged,       // command line was modified
+             cmdLineEnter,         // after entering the command line
+             cmdLineLeave,         // before leaving the command line
+             cmdUndefined,         // command undefined
+             cmdWinEnter,          // after entering the cmdline window
+             cmdWinLeave,          // before leaving the cmdline window
+             colorScheme,          // after loading a colorscheme
+             colorSchemePre,       // before loading a colorscheme
+             completeChanged,      // after completion popup menu changed
+             completeDone,         // after finishing insert complete
+             cursorHold,           // cursor in same position for a while
+             cursorHoldI,          // idem, in Insert mode
+             cursorMoved,          // cursor was moved
+             cursorMovedI,         // cursor was moved in Insert mode
+             diffUpdated,          // after diffs were updated
+             dirChanged,           // after user changed directory
+             encodingChanged,      // after changing the 'encoding' option
+             exitPre,              // before exiting
+             fileAppendCmd,        // append to a file using command
+             fileAppendPost,       // after appending to a file
+             fileAppendPre,        // before appending to a file
+             fileChangedRO,        // before first change to read-only file
+             fileChangedShell,     // after shell command that changed file
+             fileChangedShellPost, // after (not) reloading changed file
+             fileReadCmd,          // read from a file using command
+             fileReadPost,         // after reading a file
+             fileReadPre,          // before reading a file
+             fileType,             // new file type detected (user defined)
+             fileWriteCmd,         // write to a file using command
+             fileWritePost,        // after writing a file
+             fileWritePre,         // before writing a file
+             filterReadPost,       // after reading from a filter
+             filterReadPre,        // before reading from a filter
+             filterWritePost,      // after writing to a filter
+             filterWritePre,       // before writing to a filter
+             focusGained,          // got the focus
+             focusLost,            // lost the focus to another app
+             funcUndefined,        // if calling a function which doesn't exist
+             guiEnter,             // after starting the GUI
+             guiFailed,            // after starting the GUI failed
+             insertChange,         // when changing Insert/Replace mode
+             insertCharPre,        // before inserting a char
+             insertEnter,          // when entering Insert mode
+             insertLeave,          // when leaving Insert mode
+             menuPopup,            // just before popup menu is displayed
+             optionSet,            // option was set
+             quickFixCmdPost,      // after :make, :grep etc.
+             quickFixCmdPre,       // before :make, :grep etc.
+             quitPre,              // before :quit
+             remoteReply,          // upon string reception from a remote vim
+             sessionLoadPost,      // after loading a session file
+             shellCmdPost,         // after ":!cmd"
+             shellFilterPost,      // after ":1,2!cmd", ":w !cmd", ":r !cmd".
+             sourceCmd,            // sourcing a Vim script using command
+             sourcePre,            // before sourcing a Vim script
+             sourcePost,           // after sourcing a Vim script
+             spellFileMissing,     // spell file missing
+             stdinReadPost,        // after reading from stdin
+             stdinReadPre,         // before reading from stdin
+             swapExists,           // found existing swap file
+             syntax,               // syntax selected
+             tabClosed,            // after closing a tab page
+             tabEnter,             // after entering a tab page
+             tabLeave,             // before leaving a tab page
+             tabNew,               // when entering a new tab page
+             termChanged,          // after changing 'term'
+             terminalOpen,         // after a terminal buffer was created
+             termResponse,         // after setting "v:termresponse"
+             textChanged,          // text was modified not in Insert mode
+             textChangedI,         // text was modified in Insert mode
+             textChangedP,         // TextChangedI with popup menu visible
+             textYankPost,         // after some text was yanked
+             user,                 // user defined autocommand
+             vimEnter,             // after starting Vim
+             vimLeave,             // before exiting Vim
+             vimLeavePre,          // before exiting Vim and writing .viminfo
+             vimResized,           // after Vim window was resized
+             winEnter,             // after entering a window
+             winLeave,             // before leaving a window
+             winNew,               // when entering a new window
+             // MUST be the last one
+             numEvents
+
+        public init?(rawValue: RawValue) {
+            let value: Self? = switch rawValue {
+            case EVENT_BUFADD:               .bufAdd
+            case EVENT_BUFDELETE:            .bufDelete
+            case EVENT_BUFENTER:             .bufEnter
+            case EVENT_BUFFILEPOST:          .bufFilePost
+            case EVENT_BUFFILEPRE:           .bufFilePre
+            case EVENT_BUFHIDDEN:            .bufHidden
+            case EVENT_BUFLEAVE:             .bufLeave
+            case EVENT_BUFNEW:               .bufNew
+            case EVENT_BUFNEWFILE:           .bufNewFile
+            case EVENT_BUFREADCMD:           .bufReadCmd
+            case EVENT_BUFREADPOST:          .bufReadPost
+            case EVENT_BUFREADPRE:           .bufReadPre
+            case EVENT_BUFUNLOAD:            .bufUnload
+            case EVENT_BUFWINENTER:          .bufWinEnter
+            case EVENT_BUFWINLEAVE:          .bufWinLeave
+            case EVENT_BUFWIPEOUT:           .bufWipeOut
+            case EVENT_BUFWRITECMD:          .bufWriteCmd
+            case EVENT_BUFWRITEPOST:         .bufWritePost
+            case EVENT_BUFWRITEPRE:          .bufWritePre
+            case EVENT_CMDLINECHANGED:       .cmdLineChanged
+            case EVENT_CMDLINEENTER:         .cmdLineEnter
+            case EVENT_CMDLINELEAVE:         .cmdLineLeave
+            case EVENT_CMDUNDEFINED:         .cmdUndefined
+            case EVENT_CMDWINENTER:          .cmdWinEnter
+            case EVENT_CMDWINLEAVE:          .cmdWinLeave
+            case EVENT_COLORSCHEME:          .colorScheme
+            case EVENT_COLORSCHEMEPRE:       .colorSchemePre
+            case EVENT_COMPLETECHANGED:      .completeChanged
+            case EVENT_COMPLETEDONE:         .completeDone
+            case EVENT_CURSORHOLD:           .cursorHold
+            case EVENT_CURSORHOLDI:          .cursorHoldI
+            case EVENT_CURSORMOVED:          .cursorMoved
+            case EVENT_CURSORMOVEDI:         .cursorMovedI
+            case EVENT_DIFFUPDATED:          .diffUpdated
+            case EVENT_DIRCHANGED:           .dirChanged
+            case EVENT_ENCODINGCHANGED:      .encodingChanged
+            case EVENT_EXITPRE:              .exitPre
+            case EVENT_FILEAPPENDCMD:        .fileAppendCmd
+            case EVENT_FILEAPPENDPOST:       .fileAppendPost
+            case EVENT_FILEAPPENDPRE:        .fileAppendPre
+            case EVENT_FILECHANGEDRO:        .fileChangedRO
+            case EVENT_FILECHANGEDSHELL:     .fileChangedShell
+            case EVENT_FILECHANGEDSHELLPOST: .fileChangedShellPost
+            case EVENT_FILEREADCMD:          .fileReadCmd
+            case EVENT_FILEREADPOST:         .fileReadPost
+            case EVENT_FILEREADPRE:          .fileReadPre
+            case EVENT_FILETYPE:             .fileType
+            case EVENT_FILEWRITECMD:         .fileWriteCmd
+            case EVENT_FILEWRITEPOST:        .fileWritePost
+            case EVENT_FILEWRITEPRE:         .fileWritePre
+            case EVENT_FILTERREADPOST:       .filterReadPost
+            case EVENT_FILTERREADPRE:        .filterReadPre
+            case EVENT_FILTERWRITEPOST:      .filterWritePost
+            case EVENT_FILTERWRITEPRE:       .filterWritePre
+            case EVENT_FOCUSGAINED:          .focusGained
+            case EVENT_FOCUSLOST:            .focusLost
+            case EVENT_FUNCUNDEFINED:        .funcUndefined
+            case EVENT_GUIENTER:             .guiEnter
+            case EVENT_GUIFAILED:            .guiFailed
+            case EVENT_INSERTCHANGE:         .insertChange
+            case EVENT_INSERTCHARPRE:        .insertCharPre
+            case EVENT_INSERTENTER:          .insertEnter
+            case EVENT_INSERTLEAVE:          .insertLeave
+            case EVENT_MENUPOPUP:            .menuPopup
+            case EVENT_OPTIONSET:            .optionSet
+            case EVENT_QUICKFIXCMDPOST:      .quickFixCmdPost
+            case EVENT_QUICKFIXCMDPRE:       .quickFixCmdPre
+            case EVENT_QUITPRE:              .quitPre
+            case EVENT_REMOTEREPLY:          .remoteReply
+            case EVENT_SESSIONLOADPOST:      .sessionLoadPost
+            case EVENT_SHELLCMDPOST:         .shellCmdPost
+            case EVENT_SHELLFILTERPOST:      .shellFilterPost
+            case EVENT_SOURCECMD:            .sourceCmd
+            case EVENT_SOURCEPRE:            .sourcePre
+            case EVENT_SOURCEPOST:           .sourcePost
+            case EVENT_SPELLFILEMISSING:     .spellFileMissing
+            case EVENT_STDINREADPOST:        .stdinReadPost
+            case EVENT_STDINREADPRE:         .stdinReadPre
+            case EVENT_SWAPEXISTS:           .swapExists
+            case EVENT_SYNTAX:               .syntax
+            case EVENT_TABCLOSED:            .tabClosed
+            case EVENT_TABENTER:             .tabEnter
+            case EVENT_TABLEAVE:             .tabLeave
+            case EVENT_TABNEW:               .tabNew
+            case EVENT_TERMCHANGED:          .termChanged
+            case EVENT_TERMINALOPEN:         .terminalOpen
+            case EVENT_TERMRESPONSE:         .termResponse
+            case EVENT_TEXTCHANGED:          .textChanged
+            case EVENT_TEXTCHANGEDI:         .textChangedI
+            case EVENT_TEXTCHANGEDP:         .textChangedP
+            case EVENT_TEXTYANKPOST:         .textYankPost
+            case EVENT_USER:                 .user
+            case EVENT_VIMENTER:             .vimEnter
+            case EVENT_VIMLEAVE:             .vimLeave
+            case EVENT_VIMLEAVEPRE:          .vimLeavePre
+            case EVENT_VIMRESIZED:           .vimResized
+            case EVENT_WINENTER:             .winEnter
+            case EVENT_WINLEAVE:             .winLeave
+            case EVENT_WINNEW:               .winNew
+            case NUM_EVENTS:                 .numEvents
+            default:                          nil
+            }
+
+            guard let value else { return nil }
+            self = value
+        }
+
+        public var rawValue: RawValue {
+            switch self {
+            case .bufAdd:               EVENT_BUFADD
+            case .bufDelete:            EVENT_BUFDELETE
+            case .bufEnter:             EVENT_BUFENTER
+            case .bufFilePost:          EVENT_BUFFILEPOST
+            case .bufFilePre:           EVENT_BUFFILEPRE
+            case .bufHidden:            EVENT_BUFHIDDEN
+            case .bufLeave:             EVENT_BUFLEAVE
+            case .bufNew:               EVENT_BUFNEW
+            case .bufNewFile:           EVENT_BUFNEWFILE
+            case .bufReadCmd:           EVENT_BUFREADCMD
+            case .bufReadPost:          EVENT_BUFREADPOST
+            case .bufReadPre:           EVENT_BUFREADPRE
+            case .bufUnload:            EVENT_BUFUNLOAD
+            case .bufWinEnter:          EVENT_BUFWINENTER
+            case .bufWinLeave:          EVENT_BUFWINLEAVE
+            case .bufWipeOut:           EVENT_BUFWIPEOUT
+            case .bufWriteCmd:          EVENT_BUFWRITECMD
+            case .bufWritePost:         EVENT_BUFWRITEPOST
+            case .bufWritePre:          EVENT_BUFWRITEPRE
+            case .cmdLineChanged:       EVENT_CMDLINECHANGED
+            case .cmdLineEnter:         EVENT_CMDLINEENTER
+            case .cmdLineLeave:         EVENT_CMDLINELEAVE
+            case .cmdUndefined:         EVENT_CMDUNDEFINED
+            case .cmdWinEnter:          EVENT_CMDWINENTER
+            case .cmdWinLeave:          EVENT_CMDWINLEAVE
+            case .colorScheme:          EVENT_COLORSCHEME
+            case .colorSchemePre:       EVENT_COLORSCHEMEPRE
+            case .completeChanged:      EVENT_COMPLETECHANGED
+            case .completeDone:         EVENT_COMPLETEDONE
+            case .cursorHold:           EVENT_CURSORHOLD
+            case .cursorHoldI:          EVENT_CURSORHOLDI
+            case .cursorMoved:          EVENT_CURSORMOVED
+            case .cursorMovedI:         EVENT_CURSORMOVEDI
+            case .diffUpdated:          EVENT_DIFFUPDATED
+            case .dirChanged:           EVENT_DIRCHANGED
+            case .encodingChanged:      EVENT_ENCODINGCHANGED
+            case .exitPre:              EVENT_EXITPRE
+            case .fileAppendCmd:        EVENT_FILEAPPENDCMD
+            case .fileAppendPost:       EVENT_FILEAPPENDPOST
+            case .fileAppendPre:        EVENT_FILEAPPENDPRE
+            case .fileChangedRO:        EVENT_FILECHANGEDRO
+            case .fileChangedShell:     EVENT_FILECHANGEDSHELL
+            case .fileChangedShellPost: EVENT_FILECHANGEDSHELLPOST
+            case .fileReadCmd:          EVENT_FILEREADCMD
+            case .fileReadPost:         EVENT_FILEREADPOST
+            case .fileReadPre:          EVENT_FILEREADPRE
+            case .fileType:             EVENT_FILETYPE
+            case .fileWriteCmd:         EVENT_FILEWRITECMD
+            case .fileWritePost:        EVENT_FILEWRITEPOST
+            case .fileWritePre:         EVENT_FILEWRITEPRE
+            case .filterReadPost:       EVENT_FILTERREADPOST
+            case .filterReadPre:        EVENT_FILTERREADPRE
+            case .filterWritePost:      EVENT_FILTERWRITEPOST
+            case .filterWritePre:       EVENT_FILTERWRITEPRE
+            case .focusGained:          EVENT_FOCUSGAINED
+            case .focusLost:            EVENT_FOCUSLOST
+            case .funcUndefined:        EVENT_FUNCUNDEFINED
+            case .guiEnter:             EVENT_GUIENTER
+            case .guiFailed:            EVENT_GUIFAILED
+            case .insertChange:         EVENT_INSERTCHANGE
+            case .insertCharPre:        EVENT_INSERTCHARPRE
+            case .insertEnter:          EVENT_INSERTENTER
+            case .insertLeave:          EVENT_INSERTLEAVE
+            case .menuPopup:            EVENT_MENUPOPUP
+            case .optionSet:            EVENT_OPTIONSET
+            case .quickFixCmdPost:      EVENT_QUICKFIXCMDPOST
+            case .quickFixCmdPre:       EVENT_QUICKFIXCMDPRE
+            case .quitPre:              EVENT_QUITPRE
+            case .remoteReply:          EVENT_REMOTEREPLY
+            case .sessionLoadPost:      EVENT_SESSIONLOADPOST
+            case .shellCmdPost:         EVENT_SHELLCMDPOST
+            case .shellFilterPost:      EVENT_SHELLFILTERPOST
+            case .sourceCmd:            EVENT_SOURCECMD
+            case .sourcePre:            EVENT_SOURCEPRE
+            case .sourcePost:           EVENT_SOURCEPOST
+            case .spellFileMissing:     EVENT_SPELLFILEMISSING
+            case .stdinReadPost:        EVENT_STDINREADPOST
+            case .stdinReadPre:         EVENT_STDINREADPRE
+            case .swapExists:           EVENT_SWAPEXISTS
+            case .syntax:               EVENT_SYNTAX
+            case .tabClosed:            EVENT_TABCLOSED
+            case .tabEnter:             EVENT_TABENTER
+            case .tabLeave:             EVENT_TABLEAVE
+            case .tabNew:               EVENT_TABNEW
+            case .termChanged:          EVENT_TERMCHANGED
+            case .terminalOpen:         EVENT_TERMINALOPEN
+            case .termResponse:         EVENT_TERMRESPONSE
+            case .textChanged:          EVENT_TEXTCHANGED
+            case .textChangedI:         EVENT_TEXTCHANGEDI
+            case .textChangedP:         EVENT_TEXTCHANGEDP
+            case .textYankPost:         EVENT_TEXTYANKPOST
+            case .user:                 EVENT_USER
+            case .vimEnter:             EVENT_VIMENTER
+            case .vimLeave:             EVENT_VIMLEAVE
+            case .vimLeavePre:          EVENT_VIMLEAVEPRE
+            case .vimResized:           EVENT_VIMRESIZED
+            case .winEnter:             EVENT_WINENTER
+            case .winLeave:             EVENT_WINLEAVE
+            case .winNew:               EVENT_WINNEW
+            case .numEvents:            NUM_EVENTS
+            }
+        }
+    }
+}
+
 //void vimSetAutoCommandCallback(AutoCommandCallback autoCommandDispatch);
 
 public typealias AutoCommandCallback = (_ event: Vim.Event, _ buffer: Vim.Buffer?) -> Void
 var vimAutoCommandCallback: AutoCommandCallback?
 
-public extension Vim {
-    // TODO: Wrap in RawRepresentable struct
-    typealias Event = event_T
-}
-
-public func vimSetAutoCommandCallback(_ callback: @escaping AutoCommandCallback) {
+public func vimSetAutoCommandCallback(_ callback: AutoCommandCallback?) {
     vimAutoCommandCallback = callback
-    let cCallback: clibvim.AutoCommandCallback? = { event, buffer in
-        vimAutoCommandCallback?(event, buffer)
+    let cCallback: clibvim.AutoCommandCallback? = if callback != nil {
+        { cEvent, buffer in
+            vimAutoCommandCallback!(Vim.Event(rawValue: cEvent)!, buffer)
+        }
+    } else {
+        nil
     }
+
     clibvim.vimSetAutoCommandCallback(cCallback)
 }
 /**
