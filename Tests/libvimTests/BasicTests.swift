@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class BasicTests: VimTestCase {
     override func setUp() {
@@ -22,7 +22,7 @@ final class BasicTests: VimTestCase {
     }
 
     func testBasic() throws {
-        let buf = curbuf!;
+        let buf = curbuf
 
         XCTAssert(vimGetMode().contains(.normal))
 

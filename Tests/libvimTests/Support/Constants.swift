@@ -24,3 +24,15 @@ let FALSE = false
 let TRUE = true
 let OK = true
 
+// C increment operator
+postfix operator ++
+
+extension Numeric {
+    @discardableResult
+    static postfix func ++(n: inout Self) -> Self {
+        let valueBeforeIncrement = n
+        n += 1
+        return valueBeforeIncrement
+    }
+}
+

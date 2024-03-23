@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class ChdirTests: VimTestCase {
     let MAX_SIZE = 8192

@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class ColorsTests: VimTestCase {
     var colorSchemeChangedCount = 0

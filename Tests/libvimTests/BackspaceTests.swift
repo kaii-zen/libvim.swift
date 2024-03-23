@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class BackspaceTests: VimTestCase {
     override func setUp() {

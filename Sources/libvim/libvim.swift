@@ -9,14 +9,16 @@ import clibvim
 
 public enum Vim {}
 
-let NORMAL = clibvim.NORMAL
-let INSERT = clibvim.INSERT
-let VISUAL = clibvim.VISUAL
-let CMDLINE = clibvim.CMDLINE
-let OP_PENDING = clibvim.OP_PENDING
-let TERMINAL = clibvim.TERMINAL
-let Ctrl_V = clibvim.Ctrl_V |> CUnsignedChar.init |> Character.init
-let NUL = 0 |> CUnsignedChar.init |> Character.init
+// TODO: Get rid of
+public let NORMAL = clibvim.NORMAL
+public let INSERT = clibvim.INSERT
+public let VISUAL = clibvim.VISUAL
+public let CMDLINE = clibvim.CMDLINE
+public let OP_PENDING = clibvim.OP_PENDING
+public let TERMINAL = clibvim.TERMINAL
+public let Ctrl_V = clibvim.Ctrl_V |> CUnsignedChar.init |> Character.init
+// TODO: Namespace
+public let NUL = 0 |> CUnsignedChar.init |> Character.init
 
 let EVENT_INSERTENTER = clibvim.EVENT_INSERTENTER
 let EVENT_INSERTLEAVE = clibvim.EVENT_INSERTLEAVE
@@ -25,20 +27,22 @@ let EVENT_CMDLINECHANGED = clibvim.EVENT_CMDLINECHANGED
 let EVENT_CMDLINEENTER = clibvim.EVENT_CMDLINEENTER
 let EVENT_CMDLINELEAVE = clibvim.EVENT_CMDLINELEAVE
 
-let EOL_UNKNOWN = Int(clibvim.EOL_UNKNOWN) /* not defined yet */
-let EOL_UNIX = Int(clibvim.EOL_UNIX)     /* NL */
-let EOL_DOS = Int(clibvim.EOL_DOS)      /* CR NL */
-let EOL_MAC = Int(clibvim.EOL_MAC)      /* CR */
+// TODO: Get rid of
+public let EOL_UNKNOWN = Int(clibvim.EOL_UNKNOWN) /* not defined yet */
+public let EOL_UNIX = Int(clibvim.EOL_UNIX)     /* NL */
+public let EOL_DOS = Int(clibvim.EOL_DOS)      /* CR NL */
+public let EOL_MAC = Int(clibvim.EOL_MAC)      /* CR */
 
-let FILE_CHANGED = clibvim.FILE_CHANGED
+// TODO: Get rid of
+public let FILE_CHANGED = clibvim.FILE_CHANGED
 
 
 /*
  * Motion types, used for operators and for yank/delete registers.
  */
-let MCHAR = clibvim.MCHAR /* character-wise movement/register */
-let MLINE = clibvim.MLINE /* line-wise movement/register */
-let MBLOCK = clibvim.MBLOCK /* block-wise register */
+public let MCHAR = clibvim.MCHAR /* character-wise movement/register */
+public let MLINE = clibvim.MLINE /* line-wise movement/register */
+public let MBLOCK = clibvim.MBLOCK /* block-wise register */
 
 let MAUTO = clibvim.MAUTO /* Decide between MLINE/MCHAR */
 
@@ -57,10 +61,6 @@ public func vim_tempname(_ extraChar: Character, _ keep: Bool) -> String {
         CInt(keep)
     )
     return String(cString: cString!)
-}
-
-var curbuf: Vim.Buffer! {
-    clibvim.curbuf
 }
 
 /*
@@ -87,10 +87,11 @@ public extension Vim {
 
     struct BufferUpdate: RawRepresentable {
         public typealias RawValue = bufferUpdate_T
-        let buf: Buffer
-        let lnum: LineNumber  // first line with change
-        let lnume: LineNumber // line below last changed line
-        let xtra: Int         // number of extra lines (negative when deleting)
+
+        public let buf: Buffer
+        public let lnum: LineNumber  // first line with change
+        public let lnume: LineNumber // line below last changed line
+        public let xtra: Int         // number of extra lines (negative when deleting)
 
         public init?(rawValue: RawValue) {
             buf = rawValue.buf
@@ -257,10 +258,14 @@ public func vimBufferSetReadOnly(_ buf: Vim.Buffer, _ readOnly: Bool) {
 public typealias BufferUpdateCallback = (_ bufferUpdate: Vim.BufferUpdate) -> Void
 var vimBufferUpdateCallback: BufferUpdateCallback?
 
-public func vimSetBufferUpdateCallback(_ callback: @escaping BufferUpdateCallback) {
+public func vimSetBufferUpdateCallback(_ callback: BufferUpdateCallback?) {
     vimBufferUpdateCallback = callback
-    let cCallback: clibvim.BufferUpdateCallback? = { cBufferUpdate in
-        vimBufferUpdateCallback?(Vim.BufferUpdate(rawValue: cBufferUpdate)!)
+    let cCallback: clibvim.BufferUpdateCallback? = if callback != nil {
+        { cBufferUpdate in
+            vimBufferUpdateCallback!(Vim.BufferUpdate(rawValue: cBufferUpdate)!)
+        }
+    } else {
+        nil
     }
     clibvim.vimSetBufferUpdateCallback(cCallback)
 }
@@ -1013,6 +1018,7 @@ public func vimSetAutoIndentCallback(_ callback: @escaping AutoIndentCallback) {
  */
 
 public extension Vim {
+    // TODO: Replace with simple RawRepresentable proxy struct
     struct ColorSchemeCompletionContext {
         let filter: String
 
@@ -1021,7 +1027,7 @@ public extension Vim {
             set { numSchemesPointer!.pointee = CInt(newValue) }
         }
 
-        var colorSchemes: [String] {
+        public var colorSchemes: [String] {
             get {
                 Array(colorSchemesPointer!.pointee!, count: numSchemes)
                     .map { String(cString: $0!) }
@@ -1142,9 +1148,9 @@ public extension Vim {
     struct Message: RawRepresentable {
         public typealias RawValue = msg_T
 
-        var contents: String = ""
-        var title: String = ""
-        let priority: MessagePriority
+        public var contents: String = ""
+        public var title: String = ""
+        public let priority: MessagePriority
 
         public var rawValue: RawValue {
             RawValue(
@@ -1154,12 +1160,12 @@ public extension Vim {
             )
         }
 
-        func send() {
+        public func send() {
             var rawValue = rawValue
             withUnsafeMutablePointer(to: &rawValue, msg2_send)
         }
 
-        mutating func put(_ s: String) {
+        public mutating func put(_ s: String) {
             contents += s
         }
 
@@ -1278,9 +1284,9 @@ public extension Vim {
     struct GotoRequest: RawRepresentable {
         public typealias RawValue = gotoRequest_T
 
-        let count: Int
-        let location: Position
-        let target: GotoTarget
+        public let count: Int
+        public let location: Position
+        public let target: GotoTarget
 
         public var rawValue: RawValue {
             gotoRequest_T(
@@ -1325,12 +1331,12 @@ public extension Vim {
     struct FormatRequest: RawRepresentable {
         public typealias RawValue = formatRequest_T
 
-        let formatType: FormatRequestType
-        let returnCursor: Bool
-        let start: Position
-        let end: Position
-        let buf: Buffer
-        let cmd: String?
+        public let formatType: FormatRequestType
+        public let returnCursor: Bool
+        public let start: Position
+        public let end: Position
+        public let buf: Buffer
+        public let cmd: String?
 
         public var rawValue: RawValue {
             RawValue(
@@ -1344,12 +1350,12 @@ public extension Vim {
         }
 
         public init?(rawValue: RawValue) {
-            self.formatType = FormatRequestType(rawValue: rawValue.formatType)!
-            self.returnCursor = Bool(rawValue.returnCursor)
-            self.start = rawValue.start
-            self.end = rawValue.end
-            self.buf = rawValue.buf
-            self.cmd = Character(rawValue.cmd.pointee) == NUL ? nil : String(cString: rawValue.cmd)
+            formatType = FormatRequestType(rawValue: rawValue.formatType)!
+            returnCursor = Bool(rawValue.returnCursor)
+            start = rawValue.start
+            end = rawValue.end
+            buf = rawValue.buf
+            cmd = Character(rawValue.cmd.pointee) == NUL ? nil : String(cString: rawValue.cmd)
         }
     }
 
@@ -1388,8 +1394,8 @@ public extension Vim {
     struct ClearRequest: RawRepresentable {
         public typealias RawValue = clearRequest_T
 
-        let count: Int
-        let target: ClearTarget
+        public let count: Int
+        public let target: ClearTarget
 
         public var rawValue: RawValue {
             RawValue(
@@ -1399,8 +1405,8 @@ public extension Vim {
         }
 
         public init?(rawValue: RawValue) {
-            self.count = Int(rawValue.count)
-            self.target = ClearTarget(rawValue: rawValue.target)!
+            count = Int(rawValue.count)
+            target = ClearTarget(rawValue: rawValue.target)!
         }
     }
 
@@ -1422,13 +1428,13 @@ public extension Vim {
     struct OptionSet: RawRepresentable {
         public typealias RawValue = optionSet_T
 
-        let fullname: String
-        let shortname: String?
-        let type: Int
-        let numval: Int
-        let stringval: String?
-        let optFlags: Int
-        let hidden: Int
+        public let fullname: String
+        public let shortname: String?
+        public let type: Int
+        public let numval: Int
+        public let stringval: String?
+        public let optFlags: Int
+        public let hidden: Int
 
         public var rawValue: RawValue {
             RawValue(
@@ -1443,13 +1449,13 @@ public extension Vim {
         }
 
         public init?(rawValue: RawValue) {
-            self.fullname = String(cString: rawValue.fullname)
-            self.shortname = String?(rawValue.shortname)
-            self.type = Int(rawValue.type)
-            self.numval = Int(rawValue.numval)
-            self.stringval = String?(rawValue.stringval)
-            self.optFlags = Int(rawValue.opt_flags)
-            self.hidden = Int(rawValue.hidden)
+            fullname = String(cString: rawValue.fullname)
+            shortname = String?(rawValue.shortname)
+            type = Int(rawValue.type)
+            numval = Int(rawValue.numval)
+            stringval = String?(rawValue.stringval)
+            optFlags = Int(rawValue.opt_flags)
+            hidden = Int(rawValue.hidden)
         }
     }
 }
@@ -1776,7 +1782,8 @@ public func vimMacroSetStopRecordCallback(_ callback: MacroStopRecordCallback?) 
  * Options
  **/
 
-let p_enc = String(cString: clibvim.p_enc)
+// TODO: get rid
+public let p_enc = String(cString: clibvim.p_enc)
 
 public func chartabsize(_ c: Character, _ col: Vim.ColumnNumber) -> Int {
     var c = CUnsignedChar(c.asciiValue!)
@@ -1993,12 +2000,12 @@ public extension Vim {
     struct TerminalRequest: RawRepresentable {
         public typealias RawValue = terminalRequest_t
 
-        let cmd: String?
-        let rows: Int
-        let cols: Int
-        let curwin: Int
-        let finish: Character
-        let hidden: Bool
+        public let cmd: String?
+        public let rows: Int
+        public let cols: Int
+        public let curwin: Int
+        public let finish: Character
+        public let hidden: Bool
 
         public var rawValue: RawValue {
             .init(cmd: cmd?.uCString,
@@ -2355,9 +2362,10 @@ public extension Vim {
 
     struct PendingOperator: RawRepresentable {
         public typealias RawValue = pendingOp_T
-        let opType: Operator
-        let regName: Character
-        let count: Int
+
+        public let opType: Operator
+        public let regName: Character
+        public let count: Int
 
         public init?(rawValue: RawValue) {
             guard let opType = Operator(rawValue: rawValue.op_type) else { return nil }
@@ -2511,28 +2519,28 @@ public extension Vim {
     struct YankInfo: RawRepresentable {
         public typealias RawValue = yankInfo_T
 
-        var opChar: Character
-        var extraOpChar: Character
-        var regName: Character
-        var blockType: Int
-        var start: Position
-        var end: Position
-        var numLines: Int
-        var lines: [String]
+        public var opChar: Character
+        public var extraOpChar: Character
+        public var regName: Character
+        public var blockType: Int
+        public var start: Position
+        public var end: Position
+        public var numLines: Int
+        public var lines: [String]
 
         public init?(rawValue: RawValue) {
-            self.opChar = Character(rawValue.op_char)
-            self.extraOpChar = Character(rawValue.extra_op_char)
-            self.regName = Character(rawValue.regname)
-            self.blockType = Int(rawValue.blockType)
-            self.start = rawValue.start
-            self.end = rawValue.end
-            self.numLines = Int(rawValue.numLines)
-            self.lines = [String](rawValue.lines, count: rawValue.numLines)
+            opChar = Character(rawValue.op_char)
+            extraOpChar = Character(rawValue.extra_op_char)
+            regName = Character(rawValue.regname)
+            blockType = Int(rawValue.blockType)
+            start = rawValue.start
+            end = rawValue.end
+            numLines = Int(rawValue.numLines)
+            lines = [String](rawValue.lines, count: rawValue.numLines)
         }
 
         public var rawValue: RawValue {
-            RawValue(
+            .init(
                 op_char: CInt(char: opChar),
                 extra_op_char: CInt(char: extraOpChar),
                 regname: CInt(char: regName),
@@ -2544,24 +2552,29 @@ public extension Vim {
             )
         }
 
+        // TODO: Get rid
         public init(_ cYankInfoPointer: UnsafeMutablePointer<RawValue>) {
             self.init(rawValue: cYankInfoPointer.pointee)!
         }
     }
 }
 
-public func vimSetYankCallback(_ callback: @escaping YankCallback) {
+public func vimSetYankCallback(_ callback: YankCallback?) {
     vimYankCallback = callback
-    let cCallback: clibvim.YankCallback? = { yankInfoPointer in
-        let yankInfo = Vim.YankInfo(yankInfoPointer!)
-        vimYankCallback?(yankInfo)
+    let cCallback: clibvim.YankCallback? = if callback != nil {
+        { yankInfoPointer in
+            let yankInfo = Vim.YankInfo(yankInfoPointer!)
+            vimYankCallback?(yankInfo)
+        }
+    } else {
+        nil
     }
     clibvim.vimSetYankCallback(cCallback)
 }
 
 public extension Vim {
     struct Expand {
-        enum Mode: RawRepresentable {
+        public enum Mode: RawRepresentable {
             public typealias RawValue = CInt
 
             case free,
@@ -2573,7 +2586,7 @@ public extension Vim {
                  longest,
                  allKeep
 
-            init?(rawValue: RawValue) {
+            public init?(rawValue: RawValue) {
                 let value: Self? = switch rawValue {
                 case WILD_FREE: .free
                 case WILD_EXPAND_FREE: .expandFree
@@ -2590,7 +2603,7 @@ public extension Vim {
                 self = value
             }
             
-            var rawValue: CInt {
+            public var rawValue: CInt {
                 switch self {
                 case .free: WILD_FREE
                 case .expandFree: WILD_EXPAND_FREE
@@ -2604,22 +2617,27 @@ public extension Vim {
             }
         }
 
-        struct Option: Swift.OptionSet {
+        public struct Option: Swift.OptionSet {
             public typealias RawValue = CInt
-            let rawValue: RawValue
-            static let listNotFound = Option(rawValue: WILD_LIST_NOTFOUND)
-            static let homeReplace = Option(rawValue: WILD_HOME_REPLACE)
-            static let useNL = Option(rawValue: WILD_USE_NL)
-            static let noBeep = Option(rawValue: WILD_NO_BEEP)
-            static let addSlash = Option(rawValue: WILD_ADD_SLASH)
-            static let keepAll = Option(rawValue: WILD_KEEP_ALL)
-            static let silent = Option(rawValue: WILD_SILENT)
-            static let escape = Option(rawValue: WILD_ESCAPE)
-            static let iCase = Option(rawValue: WILD_ICASE)
-            static let allLinks = Option(rawValue: WILD_ALLLINKS)
+
+            public init(rawValue: RawValue) {
+                self.rawValue = rawValue
+            }
+            
+            public let rawValue: RawValue
+            public static let listNotFound = Option(rawValue: WILD_LIST_NOTFOUND)
+            public static let homeReplace = Option(rawValue: WILD_HOME_REPLACE)
+            public static let useNL = Option(rawValue: WILD_USE_NL)
+            public static let noBeep = Option(rawValue: WILD_NO_BEEP)
+            public static let addSlash = Option(rawValue: WILD_ADD_SLASH)
+            public static let keepAll = Option(rawValue: WILD_KEEP_ALL)
+            public static let silent = Option(rawValue: WILD_SILENT)
+            public static let escape = Option(rawValue: WILD_ESCAPE)
+            public static let iCase = Option(rawValue: WILD_ICASE)
+            public static let allLinks = Option(rawValue: WILD_ALLLINKS)
         }
 
-        enum Context: RawRepresentable {
+        public enum Context: RawRepresentable {
             public typealias RawValue = CInt
 
             case unsuccessful
@@ -2675,7 +2693,7 @@ public extension Vim {
             case argList
 
             public init?(rawValue: CInt) {
-                let context: Self? = switch rawValue {
+                let value: Self? = switch rawValue {
                 case EXPAND_UNSUCCESSFUL: .unsuccessful
                 case EXPAND_OK: .ok
                 case EXPAND_NOTHING: .nothing
@@ -2729,11 +2747,9 @@ public extension Vim {
                 case EXPAND_ARGLIST: .argList
                 default: nil
                 }
-                if let context {
-                    self = context
-                } else {
-                    return nil
-                }
+
+                guard let value else { return nil }
+                self = value
             }
 
             public var rawValue: CInt {
@@ -2798,7 +2814,7 @@ public extension Vim {
         public typealias CExpand = expand_T
         private var cExpand = CExpand()
 
-        var files: [String] {
+        public var files: [String] {
             get {
                 [String](cExpand.xp_files, count: cExpand.xp_numfiles)
             }
@@ -2809,10 +2825,10 @@ public extension Vim {
         }
 
         @discardableResult
-        mutating func expandOne(_ pattern: String,
-                                _ original: String?, /* allocated copy of original of expanded string */
-                                _ options: Option,
-                                _ mode: Mode) -> String? {
+        public mutating func expandOne(_ pattern: String,
+                                       _ original: String?, /* allocated copy of original of expanded string */
+                                       _ options: Option,
+                                       _ mode: Mode) -> String? {
 
             cExpand.xp_pattern = pattern.uCString
             cExpand.xp_pattern_len = CInt(pattern.utf8.count)

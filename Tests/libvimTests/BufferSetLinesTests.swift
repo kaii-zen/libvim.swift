@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class BufferSetLinesTests: VimTestCase {
     var updateCount = 0;

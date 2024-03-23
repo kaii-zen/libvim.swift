@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class RegistersTests: VimTestCase {
     override func setUp() {

@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class QuitTests: VimTestCase {
     var quitCount = 0

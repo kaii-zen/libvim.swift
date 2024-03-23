@@ -6,9 +6,13 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 class VimTestCase: XCTestCase {
+    var curbuf: Vim.Buffer {
+        vimBufferGetCurrent()
+    }
+
     func mu_check(_ condition: Bool) {
         XCTAssert(condition)
     }

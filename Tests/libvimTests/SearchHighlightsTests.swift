@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class SearchHighlightsTests: VimTestCase {
     var stopSearchHighlightCount = 0
@@ -103,7 +103,7 @@ final class SearchHighlightsTests: VimTestCase {
         mu_check(errorCount == 0);
 
         // Check original buffer
-        highlights = vimSearchGetHighlights(originalBuffer!, 0, 0)
+        highlights = vimSearchGetHighlights(originalBuffer, 0, 0)
         mu_check(highlights.count == 3);
         mu_check(errorCount == 0);
     }

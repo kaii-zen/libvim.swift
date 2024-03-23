@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class YankTests: VimTestCase {
     var yankCount = 0
@@ -21,15 +21,15 @@ final class YankTests: VimTestCase {
     override func setUp() {
         super.setUp()
 
-        vimSetYankCallback { yankInfo in
-            self.lastYankLineCount = yankInfo.numLines
-            self.lastYankLines = yankInfo.lines
-            self.lastStart = yankInfo.start
-            self.lastEnd = yankInfo.end
-            self.lastYankType = yankInfo.blockType
-            self.lastOpChar = yankInfo.opChar
-            self.lastRegname = yankInfo.regName
-            self.yankCount += 1
+        vimSetYankCallback { [unowned self] yankInfo in
+            lastYankLineCount = yankInfo.numLines
+            lastYankLines = yankInfo.lines
+            lastStart = yankInfo.start
+            lastEnd = yankInfo.end
+            lastYankType = yankInfo.blockType
+            lastOpChar = yankInfo.opChar
+            lastRegname = yankInfo.regName
+            yankCount += 1
         }
 
         vimKey("<esc>");

@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class ToggleCommentTests: VimTestCase {
     func simulateAddCommentCallback(_ buf: Vim.Buffer, _ start: Vim.LineNumber, _ end: Vim.LineNumber) -> [String]? {

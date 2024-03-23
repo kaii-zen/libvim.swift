@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class IndentationTests: VimTestCase {
     var lastRequestType = Vim.FormatRequestType.indentation

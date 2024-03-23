@@ -160,17 +160,5 @@ func |> <A, B>(x: A, f: (A) -> B) -> B {
     f(x)
 }
 
-// C increment operator
-postfix operator ++
-
-extension Numeric {
-    @discardableResult
-    static postfix func ++(n: inout Self) -> Self {
-        let valueBeforeIncrement = n
-        n += 1
-        return valueBeforeIncrement
-    }
-}
-
 let CFalse = CInt(0)
 let CTrue = CInt(1)

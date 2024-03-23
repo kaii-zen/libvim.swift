@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class CmdlineTests: VimTestCase {
     var messageCount: Int = 0

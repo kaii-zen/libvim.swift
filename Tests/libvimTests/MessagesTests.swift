@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class MessagesTests: VimTestCase {
     let collateralRelative = (collateral as NSString).abbreviatingWithTildeInPath

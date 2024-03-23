@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class CmdlineSearchTests: VimTestCase {
     override func setUp() {

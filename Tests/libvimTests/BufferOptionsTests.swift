@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class BufferOptionsTests: VimTestCase {
     let MAX_TEST_MESSAGE = 8192

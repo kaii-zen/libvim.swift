@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class InesrtModeTests: VimTestCase {
 
@@ -165,7 +165,7 @@ final class InesrtModeTests: VimTestCase {
         mu_check(vimGetSubMode() == .none);
 
         let line = vimBufferGetLine(curbuf, vimCursorGetLine());
-        mu_check(line.first! == Character(CChar(13)));
+        mu_check(line.first! == Character(Unicode.Scalar(CUnsignedChar(CChar(13)))))
     }
 
     func test_insert_mode_utf8()
@@ -184,7 +184,7 @@ final class InesrtModeTests: VimTestCase {
     {
         vimInput("O");
 
-        let input = [ CUnsignedChar(232), 128, 133, 0 ] |> String.init(cString:)
+        let input = String(cString: [ CUnsignedChar(232), 128, 133, 0 ])
         vimInput(input);
 
         let line = vimBufferGetLine(curbuf, vimCursorGetLine());

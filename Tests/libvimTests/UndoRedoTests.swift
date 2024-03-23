@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class UndoRedoTests: VimTestCase {
     override func setUp() {

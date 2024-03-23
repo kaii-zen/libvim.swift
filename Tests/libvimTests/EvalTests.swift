@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class EvalTests: VimTestCase {
     var getCharLastMode = -2

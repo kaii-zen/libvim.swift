@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import libvim
+import libvim
 
 final class MacroRecordingTests: VimTestCase {
 //    static int updateCount = 0;
