@@ -21,10 +21,10 @@ final class MappingTests: VimTestCase {
 
         vimSetInputMapCallback { [unowned self] in
             print("onMapping -",
-                  "orig_keys: |\(String(describing: $0.m_orig_keys))|",
-                  "keys: |\(String(describing: $0.m_keys))|",
-                  "orig_str: |\(String(describing: $0.m_orig_str))|",
-                  "script id: |\($0.m_script_ctx.sc_sid)|")
+                  "orig_keys: |\(String(describing: $0.originalKeys))|",
+                  "keys: |\(String(describing: $0.keys))|",
+                  "orig_str: |\(String(describing: $0.originalStr))|",
+                  "script id: |\($0.scriptContext!.scriptID)|")
 
             lastMapping = $0;
             mappingCallbackCount++;
@@ -50,8 +50,8 @@ final class MappingTests: VimTestCase {
     {
         vimExecute("inoremap jk <Esc>");
 
-        mu_check(strcmp("jk", lastMapping.m_orig_keys) == 0);
-        mu_check(strcmp("<Esc>", lastMapping.m_orig_str) == 0);
+        mu_check(strcmp("jk", lastMapping.originalKeys) == 0);
+        mu_check(strcmp("<Esc>", lastMapping.originalStr) == 0);
         mu_check(mappingCallbackCount == 1);
     };
 
@@ -59,8 +59,8 @@ final class MappingTests: VimTestCase {
     {
         vimExecute("inoremap <Esc> jk");
 
-        mu_check(strcmp("<Esc>", lastMapping.m_orig_keys) == 0);
-        mu_check(strcmp("jk", lastMapping.m_orig_str) == 0);
+        mu_check(strcmp("<Esc>", lastMapping.originalKeys) == 0);
+        mu_check(strcmp("jk", lastMapping.originalStr) == 0);
         mu_check(mappingCallbackCount == 1);
     };
 
@@ -73,8 +73,8 @@ final class MappingTests: VimTestCase {
         vimExecute("inoremap jj <F1>");
 
         mu_check(mappingCallbackCount == 2);
-        mu_check(strcmp("jj", lastMapping.m_orig_keys) == 0);
-        mu_check(strcmp("<F1>", lastMapping.m_orig_str) == 0);
+        mu_check(strcmp("jj", lastMapping.originalKeys) == 0);
+        mu_check(strcmp("<F1>", lastMapping.originalStr) == 0);
     };
 
     func test_map_same_keys_multiple_modes()
@@ -86,9 +86,9 @@ final class MappingTests: VimTestCase {
         vimExecute("nnoremap jj <F1>");
 
         mu_check(mappingCallbackCount == 2);
-        mu_check(lastMapping.m_mode == NORMAL);
-        mu_check(strcmp("jj", lastMapping.m_orig_keys) == 0);
-        mu_check(strcmp("<F1>", lastMapping.m_orig_str) == 0);
+        mu_check(lastMapping.mode == .normal);
+        mu_check(strcmp("jj", lastMapping.originalKeys) == 0);
+        mu_check(strcmp("<F1>", lastMapping.originalStr) == 0);
     };
 
     func test_sid_resolution()

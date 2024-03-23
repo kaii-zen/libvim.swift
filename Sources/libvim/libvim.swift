@@ -10,12 +10,6 @@ import clibvim
 public enum Vim {}
 
 // TODO: Get rid of
-public let NORMAL = clibvim.NORMAL
-public let INSERT = clibvim.INSERT
-public let VISUAL = clibvim.VISUAL
-public let CMDLINE = clibvim.CMDLINE
-public let OP_PENDING = clibvim.OP_PENDING
-public let TERMINAL = clibvim.TERMINAL
 public let Ctrl_V = clibvim.Ctrl_V |> CUnsignedChar.init |> Character.init
 // TODO: Namespace
 public let NUL = 0 |> CUnsignedChar.init |> Character.init
@@ -1080,8 +1074,54 @@ public func vimColorSchemeSetCompletionCallback(_ callback: ColorSchemeCompletio
  */
 
 public extension Vim {
-    // TODO: Wrap in RawRepresentable struct
-    typealias MapBlock = mapblock_T
+    typealias ScriptID = scid_T
+
+    struct ScriptContext: RawRepresentable {
+        public typealias RawValue = sctx_T
+
+        public let scriptID: ScriptID
+        public let sequence: Int
+        public let lineNumber: LineNumber
+        public let version: Int
+
+        public init?(rawValue: RawValue) {
+            scriptID = rawValue.sc_sid
+            sequence = .init(rawValue.sc_seq)
+            lineNumber = .init(rawValue.sc_lnum)
+            version = .init(rawValue.sc_version)
+        }
+
+        public var rawValue: RawValue {
+            .init(
+                sc_sid: scriptID,
+                sc_seq: .init(sequence),
+                sc_lnum: lineNumber,
+                sc_version: .init(version))
+        }
+    }
+
+    struct MapBlock: RawRepresentable {
+        public typealias RawValue = UnsafePointer<mapblock_T>?
+        public let rawValue: RawValue
+
+        public init?(rawValue: RawValue) {
+            guard let rawValue else { return nil }
+            self.rawValue = rawValue
+        }
+
+        public var next: MapBlock? { .init(rawValue: rawValue?.pointee.m_next) }
+        public var keys: String { .init(cString: rawValue!.pointee.m_keys) }
+        public var originalKeys: String { .init(cString: rawValue!.pointee.m_orig_keys) }
+        public var str: String { .init(cString: rawValue!.pointee.m_str) }
+        public var originalStr: String { .init(cString: rawValue!.pointee.m_orig_str) }
+        public var keylen: Int { .init(rawValue!.pointee.m_keylen) }
+        public var mode: State { .init(rawValue: rawValue!.pointee.m_mode) }
+        public var noremap: Bool { .init(rawValue!.pointee.m_noremap) }
+        public var silent: Bool { .init(rawValue!.pointee.m_silent) }
+        public var nowait: Bool { .init(rawValue!.pointee.m_nowait) }
+        public var expr: Bool { .init(rawValue!.pointee.m_expr) }
+        public var scriptContext: ScriptContext? { .init(rawValue: rawValue!.pointee.m_script_ctx) }
+    }
 }
 //void vimSetInputMapCallback(InputMapCallback mapCallback);
 //typedef void (*InputMapCallback)(const mapblock_T *mapping);
@@ -1092,7 +1132,7 @@ public func vimSetInputMapCallback(_ mapCallback: InputMapCallback?) {
     vimInputMapCallback = mapCallback
     let cCallback: clibvim.InputMapCallback? = if mapCallback != nil {
         {
-            vimInputMapCallback!($0!.pointee)
+            vimInputMapCallback!(Vim.MapBlock(rawValue: $0)!)
         }
     } else {
         nil
