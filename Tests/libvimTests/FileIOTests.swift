@@ -65,7 +65,7 @@ final class FileIOTests: VimTestCase {
         vimExecute("w");
 
         mu_check(writeFailureCount == 1);
-        mu_check(lastWriteFailureReason == FILE_CHANGED);
+        mu_check(lastWriteFailureReason == .fileChanged);
     }
 
     // TODO: Get passing on Arch, currently causes stack overflow

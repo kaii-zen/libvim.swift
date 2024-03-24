@@ -7,9 +7,6 @@
 
 import clibvim
 
-// TODO: Get rid of
-public let FILE_CHANGED = clibvim.FILE_CHANGED
-
 public func win_setwidth(_ width: Int) {
     clibvim.win_setwidth(CInt(width))
 }
@@ -433,23 +430,18 @@ public func vimSetCursorMoveScreenPositionCallback(_ callback: CursorMoveScreenP
     clibvim.vimSetCursorMoveScreenPositionCallback(cCallback)
 }
 
-/***
- * File I/O
- ***/
+// MARK: - File I/O
+
 //void vimSetFileWriteFailureCallback(FileWriteFailureCallback fileWriteFailureCallback);
 public typealias FileWriteFailureCallback = (_ failureReason: Vim.WriteFailureReason, _ buf: Vim.Buffer) -> Void
 var vimFileWriteFailureCallback: FileWriteFailureCallback?
-
-public extension Vim {
-    typealias WriteFailureReason = writeFailureReason_T
-}
 
 public func vimSetFileWriteFailureCallback(_ callback: FileWriteFailureCallback?) {
     vimFileWriteFailureCallback = callback
     let cCallback: clibvim.FileWriteFailureCallback? = if callback != nil {
         { reason, buf in
             vimFileWriteFailureCallback!(
-                reason,
+                Vim.WriteFailureReason(rawValue: reason)!,
                 buf!
             )
         }

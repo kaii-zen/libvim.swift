@@ -475,6 +475,30 @@ public extension Vim {
     typealias ColumnNumber = colnr_T
     typealias LineNumber = linenr_T
 
+    // MARK: - File I/O
+
+    enum WriteFailureReason: RawRepresentable {
+        public typealias RawValue = writeFailureReason_T
+
+        case fileChanged
+
+        public init?(rawValue: RawValue) {
+            let value: Self? = switch rawValue {
+            case clibvim.FILE_CHANGED: .fileChanged
+            default: nil
+            }
+
+            guard let value else { return nil }
+            self = value
+        }
+
+        public var rawValue: RawValue {
+            switch self {
+            case .fileChanged: clibvim.FILE_CHANGED
+            }
+        }
+    }
+
     // MARK: - Colorschemes
 
     // TODO: Replace with simple RawRepresentable proxy struct
