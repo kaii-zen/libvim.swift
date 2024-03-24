@@ -30,8 +30,9 @@ class VimTestCase: XCTestCase {
         super.setUp()
         vimInitOnce()
 
-        win_setwidth(5);
-        win_setheight(100);
+        vimWindowSetWidth(5)
+        vimWindowSetHeight(100)
+        
         vimBufferOpen(testfile, 1, 0);
     }
 }

@@ -7,14 +7,6 @@
 
 import clibvim
 
-public func win_setwidth(_ width: Int) {
-    clibvim.win_setwidth(CInt(width))
-}
-
-public func win_setheight(_ height: Int) {
-    clibvim.win_setheight(CInt(height))
-}
-
 public func vim_tempname(_ extraChar: Character, _ keep: Bool) -> String {
     let cString = clibvim.vim_tempname(
         CInt(extraChar.asciiValue!),

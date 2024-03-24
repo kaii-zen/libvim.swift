@@ -15,8 +15,8 @@ final class CursorTests: VimTestCase {
     class override func setUp() {
         super.setUp()
 
-        win_setwidth(80);
-        win_setheight(40);
+        vimWindowSetWidth(80)
+        vimWindowSetHeight(40)
 
         vimBufferOpen(lines100, 1, 0);
     }
