@@ -282,20 +282,22 @@ public func vimEval(_ str: String) -> String? {
 
 //void vimSetFunctionGetCharCallback(FunctionGetCharCallback callback);
 //public typealias FunctionGetCharCallback = (_ mode: Int, _ character: inout Character, _ modMask: inout Int) -> Bool
-// TODO: Remove pointers
-public typealias FunctionGetCharCallback = (_ mode: Int, _ character: UnsafeMutablePointer<CChar>?, _ modMask: UnsafeMutablePointer<CInt>?) -> Bool
+public typealias FunctionGetCharCallback = (_ mode: Int) ->  (character: Character, modMask: Int)?
 var vimFunctionGetCharCallback: FunctionGetCharCallback?
 
 public func vimSetFunctionGetCharCallback(_ callback: FunctionGetCharCallback?) {
     vimFunctionGetCharCallback = callback
     let cCallback: clibvim.FunctionGetCharCallback? = if callback != nil {
-        { mode, character, modMask in
-            vimFunctionGetCharCallback!(
-                Int(mode),
-                character,
-                modMask
-            )
-            |> CInt.init
+        { mode, characterPointer, modMaskPointer in
+            guard let result = vimFunctionGetCharCallback!(Int(mode)) else {
+                return CFalse
+            }
+            let (character, modMask) = result
+
+            characterPointer!.pointee = CChar(character.asciiValue!)
+            modMaskPointer!.pointee = CInt(modMask)
+
+            return CTrue
         }
     } else {
         nil

@@ -20,12 +20,13 @@ final class EvalTests: VimTestCase {
             print("onMessage - title: |\(title)| contents: |\(message)|")
         }
 
-        vimSetFunctionGetCharCallback { [unowned self] mode, c, modMask in
+        vimSetFunctionGetCharCallback { [unowned self] mode in
             getCharLastMode = mode
-            c!.pointee = CChar(getCharReturn.asciiValue!)
-            modMask!.pointee = CInt(getCharReturnMod)
             print("onGetChar called with mode: ", mode)
-            return OK
+            return (
+                character: getCharReturn,
+                modMask: getCharReturnMod
+            )
         }
 
         vimKey("<esc>");
