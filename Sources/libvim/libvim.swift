@@ -55,6 +55,8 @@ public func vimBufferLoad(_ ffname: String, _ lnum: Int, _ flags: CInt) -> Vim.B
  *
  * Create a new buffer
  */
+
+// TODO: write a test and implement
 //buf_T *vimBufferNew(int flags);
 
 /*
@@ -80,8 +82,11 @@ public func vimBufferGetCurrent() -> Vim.Buffer {
 }
 //void vimBufferSetCurrent(buf_T *buf);
 
+// TODO: write a test and implement
 //char_u *vimBufferGetFilename(buf_T *buf);
+// TODO: write a test and implement
 //char_u *vimBufferGetFiletype(buf_T *buf);
+
 //int vimBufferGetId(buf_T *buf);
 public func vimBufferGetId(_ buf: Vim.Buffer) -> Int {
     Int(clibvim.vimBufferGetId(buf))
@@ -351,6 +356,8 @@ public func vimSetCursorAddCallback(_ callback: CursorAddCallback?) {
  * Get the column that we'd like to be at - used to stay in the same
  * column for up/down cursor motions.
  */
+
+// TODO: write a test and implement
 //colnr_T vimCursorGetDesiredColumn(void);
 
 /***
@@ -435,9 +442,7 @@ public func vimSetFileWriteFailureCallback(_ callback: FileWriteFailureCallback?
     clibvim.vimSetFileWriteFailureCallback(cCallback)
 }
 
-/***
- * User Input
- ***/
+// MARK: - User Input
 
 /***
  * vimInput
@@ -488,9 +493,7 @@ public func vimExecuteLines(_ lines: [String]) {
     clibvim.vimExecuteLines(lines.cPointerPointer, CInt(lines.count))
 }
 
-/***
- * Auto-indent
- ***/
+// MARK: - Auto-indent
 
 public typealias AutoIndentCallback = (_ lnum: Int, _ buf: Vim.Buffer, _ prevLine: String?, _ currentLine: String?) -> Int
 var vimAutoIndentCallback: AutoIndentCallback!
@@ -873,6 +876,7 @@ public func vimMacroSetStopRecordCallback(_ callback: MacroStopRecordCallback?) 
 // TODO: get rid
 public let p_enc = String(cString: clibvim.p_enc)
 
+// TODO: get rid
 public func chartabsize(_ c: Character, _ col: Vim.ColumnNumber) -> Int {
     var c = CUnsignedChar(c.asciiValue!)
     return Int(clibvim.chartabsize(&c, col))
@@ -916,7 +920,9 @@ public func vimRegisterGet(_ regName: Character) -> [String] {
 
 // MARK: - Undo
 
+// TODO: Write test and implement
 //int vimUndoSaveCursor(void);
+
 //int vimUndoSaveRegion(linenr_T start_lnum, linenr_T end_lnum);
 @discardableResult
 public func vimUndoSaveRegion(_ startLnum: Vim.LineNumber, _ endLnum: Vim.LineNumber) -> Bool {
@@ -941,7 +947,9 @@ public func vimVisualGetType() -> Character {
     .init(clibvim.vimVisualGetType())
 }
 
+// TODO: Write test and implement
 //void vimVisualSetType(int);
+
 //int vimVisualIsActive(void);
 public func vimVisualIsActive() -> Bool {
     clibvim.vimVisualIsActive() != 0
@@ -1073,6 +1081,7 @@ public func vimWindowGetTopLine() -> Int {
     Int(clibvim.vimWindowGetTopLine())
 }
 
+// TODO: Write test and implement
 //int vimWindowGetLeftColumn(void);
 //
 //void vimWindowSetWidth(int width);
