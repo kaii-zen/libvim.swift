@@ -875,9 +875,6 @@ public func vimMacroSetStopRecordCallback(_ callback: MacroStopRecordCallback?) 
 // MARK: - Options
 
 // TODO: get rid
-public let p_enc = String(cString: clibvim.p_enc)
-
-// TODO: get rid
 public func chartabsize(_ c: Character, _ col: Vim.ColumnNumber) -> Int {
     var c = CUnsignedChar(c.asciiValue!)
     return Int(clibvim.chartabsize(&c, col))

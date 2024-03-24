@@ -107,11 +107,12 @@ final class OptionTests: VimTestCase {
         mu_check(calculatedTabSize == 4);
     }
 
-    func test_encoding_cannot_change() {
 
-        XCTAssertEqual(p_enc, "utf-8")
+    func test_encoding_cannot_change() {
+        var encoding: String { vimEval("&encoding")! }
+        XCTAssertEqual(encoding, "utf-8")
         vimExecute("set encoding=latin1");
-        XCTAssertEqual(p_enc, "utf-8")
+        XCTAssertEqual(encoding, "utf-8")
     }
 
     func test_opt_relative_number() {
