@@ -124,15 +124,16 @@ public func vimBufferGetLineCount(_ buf: Vim.Buffer) -> Int {
  */
 //void vimBufferSetLines(buf_T *buf, linenr_T start, linenr_T end, char_u **lines, int count);
 //
-public func vimBufferSetLines(_ buf: Vim.Buffer, _ start: Int, _ end: Int, _ lines: [String]) {
-    let cLines = lines.cPointerPointer
-    clibvim.vimBufferSetLines(buf, start, end, cLines, CInt(lines.count))
-}
-
 public func vimBufferSetLines(_ buf: Vim.Buffer, _ start: Int, _ end: Int, _ lines: [String], _ count: Int) {
     let cLines = lines.cPointerPointer
     clibvim.vimBufferSetLines(buf, start, end, cLines, CInt(count))
 }
+
+// Convenience function
+public func vimBufferSetLines(_ buf: Vim.Buffer, _ start: Int, _ end: Int, _ lines: [String]) {
+    vimBufferSetLines(buf, start, end, lines, lines.count)
+}
+
 
 //int vimBufferGetModified(buf_T *buf);
 public func vimBufferGetModified(_ buf: Vim.Buffer) -> Bool {
