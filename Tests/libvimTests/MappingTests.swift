@@ -14,7 +14,7 @@ final class MappingTests: VimTestCase {
 
     var unmappingCallbackCount = 0
     var lastUnmapKeys: String?
-    var lastUnmapMode = NUL
+    var lastUnmapMode = Character.nul
 
     override func setUp() {
         super.setUp()

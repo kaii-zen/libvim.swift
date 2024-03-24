@@ -36,7 +36,7 @@ final class VisualModeTests: VimTestCase {
         mu_check(!vimVisualIsActive());
 
         vimKey("<c-v>");
-        mu_check(vimVisualGetType() == Ctrl_V);
+        mu_check(vimVisualGetType() == .controlV);
         mu_check(vimVisualIsActive());
         XCTAssert(vimGetMode().contains(.visual))
 
@@ -78,7 +78,7 @@ final class VisualModeTests: VimTestCase {
         vimKey("<c-q>");
 
         XCTAssert(vimGetMode().contains(.visual))
-        mu_check(vimVisualGetType() == Ctrl_V);
+        mu_check(vimVisualGetType() == .controlV);
         mu_check(vimVisualIsActive());
     }
 
@@ -86,7 +86,7 @@ final class VisualModeTests: VimTestCase {
         vimKey("<c-Q>");
 
         XCTAssert(vimGetMode().contains(.visual))
-        mu_check(vimVisualGetType() == Ctrl_V);
+        mu_check(vimVisualGetType() == .controlV);
         mu_check(vimVisualIsActive());
     }
 

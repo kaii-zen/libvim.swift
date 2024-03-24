@@ -9,18 +9,6 @@ import XCTest
 import libvim
 
 final class MacroRecordingTests: VimTestCase {
-//    static int updateCount = 0;
-//    static int lastLnum = 0;
-//    static int lastLnume = 0;
-//    static long lastXtra = 0;
-//
-//    static int macroStartCallbackCount = 0;
-//    static int macroStopCallbackCount = 0;
-//
-//    static int lastStartRegname = -1;
-//    static int lastStopRegname = -1;
-//    static char_u *lastRegvalue = NULL;
-
     var updateCount = 0
     var lastLnum: Vim.LineNumber = 0
     var lastLnume: Vim.LineNumber = 0
@@ -29,8 +17,8 @@ final class MacroRecordingTests: VimTestCase {
     var macroStartCallbackCount = 0
     var macroStopCallbackCount = 0
 
-    var lastStartRegname = NUL
-    var lastStopRegname = NUL
+    var lastStartRegname = Character.nul
+    var lastStopRegname = Character.nul
     var lastRegvalue: String!
 
     override func setUp() {

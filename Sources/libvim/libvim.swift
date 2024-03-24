@@ -9,11 +9,6 @@ import clibvim
 
 public enum Vim {}
 
-// TODO: Get rid of
-public let Ctrl_V = clibvim.Ctrl_V |> CUnsignedChar.init |> Character.init
-// TODO: Namespace
-public let NUL = 0 |> CUnsignedChar.init |> Character.init
-
 public extension Vim {
     enum EndOfLineFormat: RawRepresentable {
         public typealias RawValue = CInt
@@ -54,7 +49,7 @@ public let FILE_CHANGED = clibvim.FILE_CHANGED
 /*
  * Motion types, used for operators and for yank/delete registers.
  */
-public let MCHAR = clibvim.MCHAR /* character-wise movement/register */
+//public let MCHAR = clibvim.MCHAR /* character-wise movement/register */
 public let MLINE = clibvim.MLINE /* line-wise movement/register */
 public let MBLOCK = clibvim.MBLOCK /* block-wise register */
 
@@ -729,6 +724,7 @@ public func vimEval(_ str: String) -> String? {
 
 //void vimSetFunctionGetCharCallback(FunctionGetCharCallback callback);
 //public typealias FunctionGetCharCallback = (_ mode: Int, _ character: inout Character, _ modMask: inout Int) -> Bool
+// TODO: Remove pointers
 public typealias FunctionGetCharCallback = (_ mode: Int, _ character: UnsafeMutablePointer<CChar>?, _ modMask: UnsafeMutablePointer<CInt>?) -> Bool
 var vimFunctionGetCharCallback: FunctionGetCharCallback?
 
@@ -1415,7 +1411,7 @@ public extension Vim {
             start = rawValue.start
             end = rawValue.end
             buf = rawValue.buf
-            cmd = Character(rawValue.cmd.pointee) == NUL ? nil : String(cString: rawValue.cmd)
+            cmd = Character(rawValue.cmd.pointee) == .nul ? nil : String(cString: rawValue.cmd)
         }
     }
 
@@ -1916,11 +1912,7 @@ public func vimUndoSync(_ force: Bool) {
 
 //int vimVisualGetType(void);
 public func vimVisualGetType() -> Character {
-    //    Character(cInt: clibvim.vimVisualGetType())
-    clibvim.vimVisualGetType()
-    |> CUnsignedChar.init
-    |> Character.init
-
+    .init(clibvim.vimVisualGetType())
 }
 
 //void vimVisualSetType(int);
@@ -2582,7 +2574,7 @@ public extension Vim {
         public var opChar: Character
         public var extraOpChar: Character
         public var regName: Character
-        public var blockType: Int
+        public var blockType: MotionType
         public var start: Position
         public var end: Position
         public var numLines: Int
@@ -2592,7 +2584,7 @@ public extension Vim {
             opChar = Character(rawValue.op_char)
             extraOpChar = Character(rawValue.extra_op_char)
             regName = Character(rawValue.regname)
-            blockType = Int(rawValue.blockType)
+            blockType = MotionType(rawValue: rawValue.blockType)!
             start = rawValue.start
             end = rawValue.end
             numLines = Int(rawValue.numLines)
@@ -2604,7 +2596,7 @@ public extension Vim {
                 op_char: CInt(char: opChar),
                 extra_op_char: CInt(char: extraOpChar),
                 regname: CInt(char: regName),
-                blockType: CInt(blockType),
+                blockType: blockType.rawValue,
                 start: start,
                 end: end,
                 numLines: CInt(numLines),

@@ -11,11 +11,11 @@ import libvim
 final class YankTests: VimTestCase {
     var yankCount = 0
     var lastYankLineCount = -1
-    var lastRegname = NUL
+    var lastRegname = Character.nul
     var lastYankLines: [String]!
     var lastStart: Vim.Position?
     var lastEnd: Vim.Position?
-    var lastYankType = -1
+    var lastYankType: Vim.MotionType?
     var lastOpChar: Character?
 
     override func setUp() {
@@ -50,8 +50,8 @@ final class YankTests: VimTestCase {
         mu_check(yankCount == 1);
         mu_check(lastYankLineCount == 1);
         mu_check(lastOpChar == "y");
-        mu_check(lastYankType == MLINE);
-        mu_check(lastRegname == NUL)
+        mu_check(lastYankType == .lineWise);
+        mu_check(lastRegname == .nul)
         mu_check(strcmp(lastYankLines[0], "This is the first line of a test file") == 0);
     };
 
@@ -65,7 +65,7 @@ final class YankTests: VimTestCase {
         mu_check(yankCount == 1);
         mu_check(lastYankLineCount == 1);
         mu_check(lastOpChar == "y");
-        mu_check(lastYankType == MLINE);
+        mu_check(lastYankType == .lineWise);
         mu_check(lastRegname == "c");
         mu_check(strcmp(lastYankLines[0], "This is the first line of a test file") == 0);
     };
@@ -97,7 +97,7 @@ final class YankTests: VimTestCase {
 
         mu_check(yankCount == 1);
         mu_check(lastYankLineCount == 1);
-        mu_check(lastYankType == MLINE);
+        mu_check(lastYankType == .lineWise);
         mu_check(strcmp(lastYankLines[0], "This is the first line of a test file") == 0);
     };
 
@@ -107,7 +107,7 @@ final class YankTests: VimTestCase {
 
         mu_check(yankCount == 1);
         mu_check(lastYankLineCount == 2);
-        mu_check(lastYankType == MLINE);
+        mu_check(lastYankType == .lineWise);
         mu_check(lastOpChar == "d");
         mu_check(strcmp(lastYankLines[0], "This is the first line of a test file") == 0);
         mu_check(strcmp(lastYankLines[1], "This is the second line of a test file") == 0);
@@ -119,7 +119,7 @@ final class YankTests: VimTestCase {
         mu_check(yankCount == 1);
 
         mu_check(lastYankLineCount == 1);
-        mu_check(lastYankType == MCHAR);
+        mu_check(lastYankType == .charWise);
         mu_check(lastOpChar == "d");
         mu_check(strcmp(lastYankLines[0], "T") == 0);
     };

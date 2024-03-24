@@ -10,7 +10,7 @@ import libvim
 
 final class EvalTests: VimTestCase {
     var getCharLastMode = -2
-    var getCharReturn = NUL
+    var getCharReturn = Character.nul
     var getCharReturnMod = 0
 
     override func setUp() {
@@ -116,7 +116,7 @@ final class EvalTests: VimTestCase {
         mu_check(getCharLastMode == -1);
         mu_check(strcmp(szNoArgs, "97") == 0);
 
-        getCharReturn = NUL;
+        getCharReturn = .nul
         let szOne = vimEval("getchar(1)");
         mu_check(getCharLastMode == 1);
         mu_check(strcmp(szOne, "0") == 0);
