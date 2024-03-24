@@ -499,34 +499,7 @@ public extension Vim {
         }
     }
 
-    // MARK: - Colorschemes
-
-    // TODO: Replace with simple RawRepresentable proxy struct
-    struct ColorSchemeCompletionContext {
-        let filter: String
-
-        private var numSchemes: UInt {
-            get { UInt(numSchemesPointer!.pointee) }
-            set { numSchemesPointer!.pointee = CInt(newValue) }
-        }
-
-        public var colorSchemes: [String] {
-            get {
-                Array(colorSchemesPointer!.pointee!, count: numSchemes)
-                    .map { String(cString: $0!) }
-            }
-            set {
-                colorSchemesPointer!.pointee = newValue.cPointerPointer
-                numSchemes = UInt(newValue.count)
-            }
-        }
-
-        let numSchemesPointer: UnsafeMutablePointer<CInt>?
-        let colorSchemesPointer: UnsafeMutablePointer<UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>?>?
-    }
-
     // MARK: - Mapping
-
 
     typealias ScriptID = scid_T
 

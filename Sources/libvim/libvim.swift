@@ -280,8 +280,6 @@ public func vimEval(_ str: String) -> String? {
     }
 }
 
-//void vimSetFunctionGetCharCallback(FunctionGetCharCallback callback);
-//public typealias FunctionGetCharCallback = (_ mode: Int, _ character: inout Character, _ modMask: inout Int) -> Bool
 public typealias FunctionGetCharCallback = (_ mode: Int) ->  (character: Character, modMask: Int)?
 var vimFunctionGetCharCallback: FunctionGetCharCallback?
 
@@ -535,21 +533,21 @@ public func vimColorSchemeSetChangedCallback(_ callback: ColorSchemeChangedCallb
     }
     clibvim.vimColorSchemeSetChangedCallback(cCallback)
 }
-//void vimColorSchemeSetCompletionCallback(ColorSchemeCompletionCallback callback);
-public typealias ColorSchemeCompletionCallback = (_ context: inout Vim.ColorSchemeCompletionContext) -> Bool
+
+public typealias ColorSchemeCompletionCallback = (_ filter: String) -> [String]?
 var vimColorSchemeCompletionCallback: ColorSchemeCompletionCallback?
 
 public func vimColorSchemeSetCompletionCallback(_ callback: ColorSchemeCompletionCallback?) {
     vimColorSchemeCompletionCallback = callback
     let cCallback: clibvim.ColorSchemeCompletionCallback? = if callback != nil {
-        { filter, count, colorSchemes in
-            var context = Vim.ColorSchemeCompletionContext(
-                filter: String(cString: filter!),
-                numSchemesPointer: count,
-                colorSchemesPointer: colorSchemes
-            )
+        { filter, countPointer, colorSchemesPointer in
+            guard let colorSchemes = vimColorSchemeCompletionCallback!(String(cString: filter!)) else {
+                return CFalse
+            }
 
-            return vimColorSchemeCompletionCallback!(&context) ? 1 : 0
+            colorSchemesPointer!.pointee = colorSchemes.cPointerPointer
+            countPointer!.pointee = CInt(colorSchemes.count)
+            return CTrue
         }
     } else {
         nil

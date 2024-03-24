@@ -21,9 +21,8 @@ final class ColorsTests: VimTestCase {
             return true
         }
 
-        vimColorSchemeSetCompletionCallback { context in
-            context.colorSchemes = [ "scheme1", "scheme2", "scheme3" ]
-            return true
+        vimColorSchemeSetCompletionCallback { _ in
+            [ "scheme1", "scheme2", "scheme3" ]
         }
 
         vimKey("<esc>");
