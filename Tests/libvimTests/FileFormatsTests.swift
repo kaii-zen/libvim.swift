@@ -39,7 +39,7 @@ final class FileFormatsTests: VimTestCase {
     func test_write_crlf_file() {
         vimBufferOpen("\(collateral)/test.crlf", 1, 0);
 
-        let tmp = vim_tempname("t", FALSE);
+        let tmp = generateTemporaryFilename()
         let cmd = "w \(tmp)";
 
         vimExecute(cmd);
@@ -60,7 +60,7 @@ final class FileFormatsTests: VimTestCase {
 
     func test_write_lf_file() {
         vimBufferOpen("\(collateral)/test.lf", 1, 0);
-        let tmp = vim_tempname("t", FALSE);
+        let tmp = generateTemporaryFilename()
 
         let cmd = "w \(tmp)"
 

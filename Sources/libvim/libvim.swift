@@ -7,14 +7,6 @@
 
 import clibvim
 
-public func vim_tempname(_ extraChar: Character, _ keep: Bool) -> String {
-    let cString = clibvim.vim_tempname(
-        CInt(extraChar.asciiValue!),
-        CInt(keep)
-    )
-    return String(cString: cString!)
-}
-
 /*
  * vimInit
  *

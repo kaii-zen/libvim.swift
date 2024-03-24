@@ -33,7 +33,7 @@ final class FileIOTests: VimTestCase {
             lastPriority = priority
         }
 
-        tempFile = vim_tempname("t", FALSE)
+        tempFile = generateTemporaryFilename()
 
         vimKey("<esc>");
         vimKey("<esc>");

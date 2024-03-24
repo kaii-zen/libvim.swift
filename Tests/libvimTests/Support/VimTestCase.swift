@@ -12,6 +12,14 @@ class VimTestCase: XCTestCase {
     var curbuf: Vim.Buffer {
         vimBufferGetCurrent()
     }
+    
+    func generateTemporaryFilename() -> String {
+        FileManager
+            .default
+            .temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .path(percentEncoded: false)
+    }
 
     func mu_check(_ condition: Bool) {
         XCTAssert(condition)
@@ -32,7 +40,7 @@ class VimTestCase: XCTestCase {
 
         vimWindowSetWidth(5)
         vimWindowSetHeight(100)
-        
+
         vimBufferOpen(testfile, 1, 0);
     }
 }
