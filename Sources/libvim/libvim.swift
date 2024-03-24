@@ -10,16 +10,6 @@ import clibvim
 // TODO: Get rid of
 public let FILE_CHANGED = clibvim.FILE_CHANGED
 
-/*
- * Motion types, used for operators and for yank/delete registers.
- */
-//public let MCHAR = clibvim.MCHAR /* character-wise movement/register */
-public let MLINE = clibvim.MLINE /* line-wise movement/register */
-public let MBLOCK = clibvim.MBLOCK /* block-wise register */
-
-let MAUTO = clibvim.MAUTO /* Decide between MLINE/MCHAR */
-
-
 public func win_setwidth(_ width: Int) {
     clibvim.win_setwidth(CInt(width))
 }
